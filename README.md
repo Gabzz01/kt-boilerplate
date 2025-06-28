@@ -1,6 +1,6 @@
 # Kotlin JVM Boilerplate
 
-An opinionated boilerplate project for Kotlin JVM applications, designed to be simple, maintainable, and easy to extend.
+An opinionated boilerplate project for Kotlin JVM applications that comes with a DevSecOps pipeline, designed to be simple, maintainable, and easy to extend.
 
 ## Libraries and tools
 

@@ -80,3 +80,10 @@ tasks.shadowJar {
     archiveVersion = ""
     archiveClassifier = "fat"
 }
+
+dependencyCheck {
+    failBuildOnCVSS = 7.0f
+    data {
+        directory = "$rootDir/.dependency-check-data"
+    }
+}

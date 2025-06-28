@@ -31,12 +31,12 @@ jobs:
         uses: actions/checkout@v4
       # Run the "semgrep scan" command on the command line of the docker image.
       - name: Run Semgrep
-        run: semgrep ci
-        env:
+        run: semgrep scan # ci
+        # env:
           # Connect to Semgrep AppSec Platform through your SEMGREP_APP_TOKEN.
           # Generate a token from Semgrep AppSec Platform > Settings
           # and add it to your GitHub secrets.
-          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+          # SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
   build-app:
     name: Build Application
@@ -56,6 +56,11 @@ jobs:
           cache-dependency-path: |
             .gradle*
             ./**/gradle-wrapper.properties
+      - name: Cache OWASP Dependency-Check DB
+        uses: actions/cache@v4
+        with:
+          path: .dependency-check-data
+          key: dependency-check-db-${{ runner.os }}
 
       - name: Build Server
         run: ./gradlew build dependencyCheckAnalyze

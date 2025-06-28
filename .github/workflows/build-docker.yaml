@@ -12,6 +12,7 @@ jobs:
     uses: ./.github/workflows/build-code.yaml
 
   build-image:
+    name: Build & push Docker image
     needs: build-codebase
     runs-on: ubuntu-latest
     outputs:
@@ -53,6 +54,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   scan-image:
+    name: Scan Docker image for vulnerabilities
     needs: [build-image]
     runs-on: ubuntu-latest
     steps:
