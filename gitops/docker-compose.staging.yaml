@@ -1,0 +1,28 @@
+services:
+  app:
+    image: ghcr.io/org/placeholder:latest
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://dd-agent:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_TRACES_EXPORTER: otlp
+
+  # Datadog agent with OpenTelemtry endpoints
+  dd-agent:
+    image: gcr.io/datadoghq/agent:7
+    container_name: dd-agent
+    environment:
+      DD_SITE: datadoghq.eu
+      DD_API_KEY: "${DD_API_KEY:?DD_API_KEY is required}"
+      DD_ENV: staging
+      DD_APM_ENABLED: 'true'
+      # Enable OTLP Endpoints : https://docs.datadoghq.com/fr/opentelemetry/interoperability/otlp_ingest_in_the_agent/?tab=docker
+      DD_OTLP_CONFIG_RECEIVER_PROTOCOLS_GRPC_ENDPOINT: 0.0.0.0:4317
+      DD_OTLP_CONFIG_RECEIVER_PROTOCOLS_HTTP_ENDPOINT: 0.0.0.0:4318
+      DD_LOGS_ENABLED: true
+      DD_OTLP_CONFIG_LOGS_ENABLED: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+    cgroup: host
+    pid: host

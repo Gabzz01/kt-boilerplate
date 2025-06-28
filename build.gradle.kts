@@ -10,6 +10,7 @@ plugins {
     id("com.google.devtools.ksp") version "2.1.21-2.0.1"
     application
     id("com.gradleup.shadow") version "8.3.2"
+    id("org.owasp.dependencycheck") version "12.1.3"
 }
 
 kotlin {
@@ -23,7 +24,7 @@ repositories {
     mavenCentral()
 }
 
-val koinVersion = "4.0.3"
+val koinVersion = "4.0.4"
 val openTelemetryVersion = "1.49.0"
 
 dependencies {
@@ -52,6 +53,12 @@ dependencies {
 
     // Tests
     testImplementation(kotlin("test"))
+    testImplementation("io.insert-koin:koin-test:$koinVersion")
+}
+
+ksp {
+    // See https://insert-koin.io/docs/reference/koin-annotations/start/
+    arg("KOIN_CONFIG_CHECK","true")
 }
 
 sourceSets.main {

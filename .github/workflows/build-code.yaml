@@ -5,8 +5,8 @@ permissions:
 
 on:
   push:
-   # branches-ignore:
-   #   - master
+   branches-ignore:
+     - main
   workflow_dispatch:
   workflow_call:
     outputs:
@@ -38,10 +38,11 @@ jobs:
           # and add it to your GitHub secrets.
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
-  build-server:
+  build-app:
+    name: Build Application
     runs-on: ubuntu-latest
     outputs:
-      artifact: server-build-${{github.run_number}}
+      artifact: app-build
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -57,7 +58,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build Server
-        run: ./gradlew build shadowJar
+        run: ./gradlew build dependencyCheckAnalyze
 
         # Upload the build artifacts for reuse in the Docker job
       - name: Upload build artifacts
@@ -65,7 +66,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: app-build-${{github.run_number}}
+          name: app-build
           path: build/libs/app-fat.jar
           retention-days: 1
           overwrite: true

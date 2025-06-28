@@ -1,0 +1,33 @@
+name: 🔧 GitOps
+run-name: ${{ github.actor }} is updating staging stack.
+
+on:
+  workflow_call:
+    inputs:
+      app-img:
+        required: true
+        type: string
+    secrets:
+      GITOPS_BOT_GITHUB_TOKEN:
+        required: true
+
+jobs:
+  update-image-tags:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: master
+      - name: Update image
+        run: |
+          # Use sed for precise replacement without affecting other parts
+          sed -i 's|image: ghcr.io/rtz-developments/markeat/mrkt-server:.*|image: ${{ inputs.app-img }}|' gitops/docker-compose.staging.yaml
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add gitops/docker-compose.staging.yaml
+          git commit -m "Updated gitops/docker-compose.staging.yaml"
+          git remote set-url origin https://x-access-token:${{ secrets.GITOPS_BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git push
