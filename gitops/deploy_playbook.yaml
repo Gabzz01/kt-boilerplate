@@ -1,14 +1,43 @@
-- name: Deploy containers
+# Add servers to known_hosts
+- name: Setup SSH connection
   hosts: "{{ target_env | default('staging') }}"
+  gather_facts: false
   tasks:
-    - name: Ping my hosts
-      ansible.builtin.ping:
-
     - name: Add each host's SSH key to known_hosts
       ansible.builtin.known_hosts:
         path: "~/.ssh/known_hosts"
         name: "{{ inventory_hostname }}"
         key: "{{ lookup('pipe', 'ssh-keyscan -T 5 -H ' + inventory_hostname) }}"
+      delegate_to: localhost
+
+# Ensure the target environment is properly set
+- name: Configure Docker
+  hosts: "{{ target_env | default('staging') }}"
+  gather_facts: false
+  tasks:
+    - name: Ensure Docker service is running
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+    - name: adding existing user '{{ ansible_user }}' to docker group
+      ansible.builtin.user:
+        name: '{{ ansible_user }}'
+        groups: docker
+        append: yes
+      become: yes
+      register: user_group_result
+    # Activate group changes if the user was added to the docker group
+    - name: Reset connection to pick up group changes
+      block:
+        - ansible.builtin.meta: reset_connection
+      when: user_group_result.changed
+
+- name: Deploy containers
+  hosts: "{{ target_env | default('staging') }}"
+  tasks:
+    - name: Ping my hosts
+      ansible.builtin.ping:
 
     - name: Login against ghcr.io
       community.docker.docker_login:
@@ -20,11 +49,14 @@
       ansible.builtin.file:
         path: /opt/app
         state: directory
-        mode: '0755'
+        mode: '0775' # Group writable
+        owner: root
+        group: docker
+      become: yes
 
     - name: Copy manifests
       ansible.builtin.copy:
-        src: "gitops/{{ target_env | default('staging') }}/"
+        src: "{{ playbook_dir }}/{{ target_env | default('staging') }}/"
         dest: /opt/app/
 
     # Pull images before stopping containers to limit down time and ensure the latest images are available
@@ -39,8 +71,11 @@
       community.docker.docker_compose_v2:
         # Use project name to also remove containers that are not defined in the updated docker-compose.yaml
         project_name: app
+        project_src: /opt/app
         remove_images: all
         state: absent
+        remove_volumes: true
+        remove_orphans: true
       register: output
 
     - name: Show results
