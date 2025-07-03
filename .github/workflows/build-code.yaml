@@ -39,6 +39,7 @@ jobs:
         # SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
       - name: Set GitHub Step Summary
         run: cat semgrep.txt > $GITHUB_STEP_SUMMARY
+
   build-app:
     name: Build Application
     runs-on: ubuntu-latest

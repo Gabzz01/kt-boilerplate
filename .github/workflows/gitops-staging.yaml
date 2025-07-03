@@ -22,7 +22,7 @@ jobs:
       - name: Update image
         run: |
           # Use sed for precise replacement without affecting other parts
-          sed -i 's|image: ghcr.io/rtz-developments/markeat/mrkt-server:.*|image: ${{ inputs.app-img }}|' gitops/docker-compose.staging.yaml
+          sed -i 's|image: ghcr.io/namespace/project/placeholder:.*|image: ${{ inputs.app-img }}|' gitops/docker-compose.staging.yaml
       - name: Commit and push changes
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"

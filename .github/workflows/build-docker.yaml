@@ -64,10 +64,13 @@ jobs:
         with:
           image-ref: '${{ needs.build-image.outputs.tag }}'
           format: 'table'
+          output: 'trivy-results.txt'
           exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+      - name: Set GitHub Step Summary
+        run: cat trivy-results.txt > $GITHUB_STEP_SUMMARY
 
   # # Call the GitOps workflow to update the staging docker-compose stack with the updated image.
   # do-gitops:
