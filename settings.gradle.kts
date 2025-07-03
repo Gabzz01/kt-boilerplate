@@ -7,6 +7,28 @@
 
 rootProject.name = "kt-boilerplate"
 
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+
+    plugins {
+        kotlin("jvm") version "2.2.0"
+        kotlin("multiplatform") version "2.2.0"
+        kotlin("plugin.serialization") version "2.2.0"
+        id("com.google.devtools.ksp") version "2.2.0-2.0.2"
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
+
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention").version("0.9.0")
 }
+
+include(":core")

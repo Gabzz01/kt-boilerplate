@@ -5,9 +5,9 @@
  * Learn more about Gradle by exploring our Samples at https://docs.gradle.org/8.14.2/samples
  */
 plugins {
-    kotlin("jvm") version "2.1.21" // Kotlin version to use
-    kotlin("plugin.serialization") version "2.1.21"
-    id("com.google.devtools.ksp") version "2.1.21-2.0.1"
+    kotlin("jvm")
+    kotlin("plugin.serialization")
+    id("com.google.devtools.ksp")
     application
     id("com.gradleup.shadow") version "8.3.2"
     id("org.owasp.dependencycheck") version "12.1.3"
@@ -20,27 +20,15 @@ kotlin {
     }
 }
 
-repositories {
-    mavenCentral()
-}
-
-val koinVersion = "4.0.4"
-val openTelemetryVersion = "1.49.0"
+val openTelemetryVersion: String by project
+val koinVersion: String by project
 
 dependencies {
 
-    // Kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
-
-    // Koin
-    implementation("io.insert-koin:koin-core:$koinVersion")
-    implementation("io.insert-koin:koin-annotations:2.1.0")
-    ksp("io.insert-koin:koin-ksp-compiler:2.1.0")
+    // Project dependencies
+    implementation(project(":core"))
 
     // Logging
-    implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
     implementation("ch.qos.logback:logback-classic:1.5.13")
 
     // OpenTelemetry
@@ -59,6 +47,7 @@ dependencies {
 ksp {
     // See https://insert-koin.io/docs/reference/koin-annotations/start/
     arg("KOIN_CONFIG_CHECK","true")
+    arg("KOIN_DEFAULT_MODULE", "false")
 }
 
 sourceSets.main {

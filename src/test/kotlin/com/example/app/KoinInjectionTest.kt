@@ -1,5 +1,6 @@
 package com.example.app
 
+import com.example.app.core.CoreModule
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.dsl.module
 import org.koin.ksp.generated.module
@@ -16,7 +17,7 @@ class KoinInjectionTest {
     fun testDiGraph() {
         module {
             includes(
-                AppModule().module
+                CoreModule().module
             )
         }.verify()
 

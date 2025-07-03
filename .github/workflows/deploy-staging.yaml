@@ -33,6 +33,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: ⬇️ Pull images
-        run: docker-compose --file gitops/docker-compose.staging.yaml pull -q
+        run: docker-compose --file gitops/docker-compose.yaml pull -q
       - name: Deploy via Docker Compose
-        run: docker-compose --file gitops/docker-compose.staging.yaml up -d --force-recreate
+        run: docker-compose --file gitops/docker-compose.yaml up -d --force-recreate

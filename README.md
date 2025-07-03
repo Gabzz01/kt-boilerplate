@@ -1,6 +1,6 @@
 # Kotlin JVM Boilerplate
 
-An opinionated boilerplate project for Kotlin JVM applications that comes with a DevSecOps pipeline, designed to be simple, maintainable, and easy to extend.
+An opinionated boilerplate project for Kotlin JVM applications respecting the Onion Architecture that comes with a DevSecOps pipeline, designed to be simple, maintainable, and easy to extend.
 
 ## Libraries and tools
 
@@ -9,22 +9,6 @@ This project leverages the following libraries / tools :
 - [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization)
 - [kotlinx.coroutines](https://github.com/Kotlin/kotlinx.coroutines)
 - [kotlinx.datetime](https://github.com/Kotlin/kotlinx-datetime)
-
-## DevSecOps pipeline
-
-### Continuous Integration
-
-### Security scans
-
-This project includes a DevSecOps pipeline that integrates with GitHub Actions that offers the following capabilities:
-
-- SAST using Semgrep Open Source
-- Dependency Scanning using OWASP Dependency-Check grade plugin
-- Container Scanning using Trivy
-
-### Continuous Delivery
-
-This setup implements the GitOps model. 
 
 ## Bootstrapping a project
 
@@ -47,3 +31,19 @@ To run the application, use:
 ```sh
 ./gradlew run
 ```
+
+## DevSecOps pipeline
+
+### Continuous Integration
+
+### Security scans
+
+This project includes a DevSecOps pipeline that integrates with GitHub Actions that offers the following capabilities:
+
+- SAST using Semgrep Open Source
+- Dependency Scanning using OWASP Dependency-Check grade plugin
+- Container Scanning using Trivy
+
+### Continuous Delivery
+
+This setup implements the GitOps model. 
