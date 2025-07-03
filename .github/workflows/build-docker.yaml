@@ -56,7 +56,7 @@ jobs:
 
   scan-image:
     name: Scan Docker image for vulnerabilities
-    needs: [build-image]
+    needs: [ build-image ]
     runs-on: ubuntu-latest
     steps:
       - name: Run Trivy vulnerability scanner
@@ -72,11 +72,9 @@ jobs:
       - name: Set GitHub Step Summary
         run: cat trivy-results.txt > $GITHUB_STEP_SUMMARY
 
-  # # Call the GitOps workflow to update the staging docker-compose stack with the updated image.
-  # do-gitops:
-  #   uses: ./.github/workflows/gitops-staging.yaml
-  #   needs: [build-image]
-  #   with:
-  #     app-img: ${{ needs.build-image.outputs.tag }}
-  #   secrets:
-  #     GITOPS_BOT_GITHUB_TOKEN: ${{ secrets.GITOPS_BOT_GITHUB_TOKEN }}
+  # Call the GitOps workflow to update the staging docker-compose stack with the updated image.
+  do-gitops:
+    uses: ./.github/workflows/gitops-staging.yaml
+    needs: [ build-image ]
+    with:
+      app-img: ${{ needs.build-image.outputs.tag }}

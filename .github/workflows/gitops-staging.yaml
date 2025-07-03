@@ -1,5 +1,7 @@
 name: 🔧 GitOps
 run-name: ${{ github.actor }} is updating staging stack.
+permissions:
+  contents: write
 
 on:
   workflow_call:
@@ -7,9 +9,6 @@ on:
       app-img:
         required: true
         type: string
-    secrets:
-      GITOPS_BOT_GITHUB_TOKEN:
-        required: true
 
 jobs:
   update-image-tags:
@@ -18,16 +17,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: master
+          ref: main
       - name: Update image
+        # Use sed for precise replacement without affecting other parts
         run: |
-          # Use sed for precise replacement without affecting other parts
-          sed -i 's|image: ghcr.io/namespace/project/placeholder:.*|image: ${{ inputs.app-img }}|' gitops/docker-compose.staging.yaml
+          sed -i 's|image: ghcr.io/namespace/project/placeholder:.*|image: ${{ inputs.app-img }}|' gitops/staging/docker-compose.yaml
       - name: Commit and push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add gitops/docker-compose.staging.yaml
-          git commit -m "Updated gitops/docker-compose.staging.yaml"
+          git add gitops/staging/docker-compose.yaml
+          git commit -m "Updated gitops/staging/docker-compose.yaml"
           git remote set-url origin https://x-access-token:${{ secrets.GITOPS_BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git push
