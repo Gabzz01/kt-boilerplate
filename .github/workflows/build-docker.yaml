@@ -74,6 +74,7 @@ jobs:
 
   # Call the GitOps workflow to update the staging docker-compose stack with the updated image.
   do-gitops:
+    name: GitOps Staging
     uses: ./.github/workflows/gitops-staging.yaml
     needs: [ build-image ]
     with:

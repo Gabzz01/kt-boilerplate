@@ -18,10 +18,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: main
+      # - name: Install yq
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y yq
       - name: Update image
-        # Use sed for precise replacement without affecting other parts
         run: |
-          sed -i 's|image: ghcr.io/namespace/project/placeholder:.*|image: ${{ inputs.app-img }}|' gitops/staging/docker-compose.yaml
+          yq e -i '.services.app.image = "${{ inputs.app-img }}"' gitops/staging/docker-compose.yaml
       - name: Commit and push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -32,3 +35,7 @@ jobs:
           git commit -m "Updated gitops/staging/docker-compose.yaml"
           git remote set-url origin https://x-access-token:${{ secrets.GITOPS_BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git push
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          event-type: gitops-staging
