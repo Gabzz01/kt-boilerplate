@@ -33,7 +33,6 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add gitops/staging/docker-compose.yaml
           git commit -m "Updated gitops/staging/docker-compose.yaml"
-          git remote set-url origin https://x-access-token:${{ secrets.GITOPS_BOT_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git push
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v3
