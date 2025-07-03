@@ -1,11 +1,10 @@
 services:
   app:
-    image: ghcr.io/gabzz01/kt-boilerplate/app:sha-33b33ad
+    image: ghcr.io/gabzz01/kt-boilerplate/app:sha-19da14e
     environment:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://dd-agent:4318
       OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
       OTEL_TRACES_EXPORTER: otlp
-
   # Datadog agent with OpenTelemtry endpoints
   dd-agent:
     image: gcr.io/datadoghq/agent:7
