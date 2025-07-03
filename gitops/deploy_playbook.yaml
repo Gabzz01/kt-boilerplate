@@ -4,16 +4,37 @@
     - name: Ping my hosts
       ansible.builtin.ping:
 
-    - name: Copy docker-compose.yaml
+    - name: Add each host's SSH key to known_hosts
+      ansible.builtin.known_hosts:
+        path: "~/.ssh/known_hosts"
+        name: "{{ inventory_hostname }}"
+        key: "{{ lookup('pipe', 'ssh-keyscan -T 5 -H ' + inventory_hostname) }}"
+      delegate_to: localhost
+      run_once: false
+
+    - name: Login against ghcr.io
+      community.docker.docker_login:
+        registry: ghcr.io
+        username: "{{ lookup('env', 'REGISTRY_USR') }}"
+        password: "{{ lookup('env', 'REGISTRY_PSSWD') }}"
+
+    - name: Ensure app directory exists
+      ansible.builtin.file:
+        path: /opt/app
+        state: directory
+        mode: '0755'
+
+    - name: Copy manifests
       ansible.builtin.copy:
-        src: gitops/staging/docker-compose.yaml
-        dest: /opt/app/docker-compose.yaml
-    
+        src: "gitops/{{ target_env | default('staging') }}/"
+        dest: /opt/app/
+
     # Pull images before stopping containers to limit down time and ensure the latest images are available
     - name: Pull images
       community.docker.docker_compose_v2:
         project_src: /opt/app
-        state: stopped
+        pull: always
+        state: present
       register: output
 
     - name: Tear down existing containers
@@ -32,8 +53,10 @@
       community.docker.docker_compose_v2:
         # Use project name to also remove containers that are not defined in the updated docker-compose.yaml
         project_name: app
+        project_src: /opt/app
         state: present
         wait: true
+        wait_timeout: 60
       register: output
 
     - name: Show results

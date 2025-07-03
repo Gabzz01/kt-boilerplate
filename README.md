@@ -34,6 +34,11 @@ To run the application, use:
 
 ## DevSecOps pipeline
 
+### Required secrets
+
+- `ANSIBLE_VAULT_PSSWD`
+- `ANSIBLE_SSH_KEY`
+
 ### Continuous Integration
 
 ### Security scans
@@ -46,4 +51,17 @@ This project includes a DevSecOps pipeline that integrates with GitHub Actions t
 
 ### Continuous Delivery
 
-This setup implements the GitOps model. 
+This setup implements the GitOps model and relies on Ansible for automated deployments.
+
+You'll need a server with Docker installed and SSH key authentication configured.
+
+To generate a ssh key run :
+```sh
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_cicd
+# Enter your passphrase when propmpted
+```
+
+Then add the generated public key to the authorized keys on the remote machine.
+Head onto the [Github repository settings page and create a Action secret](./settings/secrets/actions) and :
+* create a `DEPLOYMENT_SSH_KEY` secret with the contents of the generated private key (*e.g. ~/.ssh/id_rsa_cicd*) 
+* create a `DEPLOYMENT_SSH_KEY_PASSPHRASE` secret with the key passphrase.

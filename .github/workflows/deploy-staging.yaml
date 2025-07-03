@@ -12,12 +12,15 @@ on:
       - 'gitops/staging/**'
 
 jobs:
-  deploy-via-ssh:
+  deploy:
+    name: 🚀 Run deploy playbook
     runs-on: ubuntu-latest
     env:
       SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-      DOCKER_HOST: ssh://${{ vars.STAGING_SERVER_USR }}@${{ vars.STAGING_SERVER_HOST }}
-      DD_API_KEY: ${{ secrets.DD_API_KEY }}
+      # Registry credentials for Docker login by Ansible
+      REGISTRY_USR: ${{ github.actor }}
+      REGISTRY_PSSWD: ${{ secrets.GITHUB_TOKEN }}
+      ANSIBLE_VAULT_PASSWORD_FILE: "~/.ansible-vault-pass"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,25 +28,17 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y ansible
-      - name: Install Docker Compose
-        run: |
-          curl -SL https://github.com/docker/compose/releases/download/v2.35.1/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
-          chmod +x /usr/local/bin/docker-compose
       - name: Setup SSH
+        # Load SSH key and configure known hosts
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -p 22 ${{ vars.STAGING_SERVER_HOST }} >> ~/.ssh/known_hosts
-          echo "${{ secrets.STG_SSH_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.DEPLOYMENT_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null	
-          ssh-add ~/.ssh/id_rsa <<< "${{ secrets.STG_SSH_KEY_PASSPHRASE }}"
-      - name: Log in to the Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: ⬇️ Pull images
-        run: docker-compose --file gitops/docker-compose.yaml pull -q
-      - name: Deploy via Docker Compose
-        run: docker-compose --file gitops/docker-compose.yaml up -d --force-recreate
+          ssh-add ~/.ssh/id_rsa <<< "${{ secrets.DEPLOYMENT_SSH_KEY_PASSPHRASE }}"
+      - name: 🔑 Setup Ansible Vault Password
+        run: |
+          echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > ~/.ansible-vault-pass
+          chmod 600 ~/.ansible-vault-pass
+      - name: ▶️ Run deployment playbook
+        run: ansible-playbook -i gitops/inventory.ini gitops/deploy_playbook.yaml -e "target_env=staging"
