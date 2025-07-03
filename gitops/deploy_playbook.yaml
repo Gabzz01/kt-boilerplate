@@ -9,8 +9,6 @@
         path: "~/.ssh/known_hosts"
         name: "{{ inventory_hostname }}"
         key: "{{ lookup('pipe', 'ssh-keyscan -T 5 -H ' + inventory_hostname) }}"
-      delegate_to: localhost
-      run_once: false
 
     - name: Login against ghcr.io
       community.docker.docker_login:
