@@ -9,6 +9,7 @@ on:
 
 jobs:
   build-codebase:
+    name: Build codebase
     uses: ./.github/workflows/build-code.yaml
 
   build-image:

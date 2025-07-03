@@ -5,8 +5,8 @@ permissions:
 
 on:
   push:
-   branches-ignore:
-     - main
+    branches-ignore:
+      - main
   workflow_dispatch:
   workflow_call:
     outputs:
@@ -31,13 +31,14 @@ jobs:
         uses: actions/checkout@v4
       # Run the "semgrep scan" command on the command line of the docker image.
       - name: Run Semgrep
-        run: semgrep scan # ci
-        # env:
+        run: semgrep scan --text --text-output=semgrep.txt # ci
+          # env:
           # Connect to Semgrep AppSec Platform through your SEMGREP_APP_TOKEN.
           # Generate a token from Semgrep AppSec Platform > Settings
           # and add it to your GitHub secrets.
-          # SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-
+        # SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+      - name: Set GitHub Step Summary
+        run: cat semgrep.txt > $GITHUB_STEP_SUMMARY
   build-app:
     name: Build Application
     runs-on: ubuntu-latest
