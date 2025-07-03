@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/gabzz01/kt-boilerplate/app:sha-5f7d91c
+    image: ghcr.io/gabzz01/kt-boilerplate/app:sha-d2e99ee
     environment:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://dd-agent:4318
       OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
