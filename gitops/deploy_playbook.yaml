@@ -1,9 +1,41 @@
-- name: My first play
-  hosts: servers
+- name: Deploy containers
+  hosts: "{{ target_env | default('staging') }}"
   tasks:
     - name: Ping my hosts
       ansible.builtin.ping:
 
-    - name: Print message
+    - name: Copy docker-compose.yaml
+      ansible.builtin.copy:
+        src: gitops/staging/docker-compose.yaml
+        dest: /opt/app/docker-compose.yaml
+    
+    # Pull images before stopping containers to limit down time and ensure the latest images are available
+    - name: Pull images
+      community.docker.docker_compose_v2:
+        project_src: /opt/app
+        state: stopped
+      register: output
+
+    - name: Tear down existing containers
+      community.docker.docker_compose_v2:
+        # Use project name to also remove containers that are not defined in the updated docker-compose.yaml
+        project_name: app
+        remove_images: all
+        state: absent
+      register: output
+
+    - name: Show results
       ansible.builtin.debug:
-        msg: Hello world
+        var: output
+
+    - name: Create & start services
+      community.docker.docker_compose_v2:
+        # Use project name to also remove containers that are not defined in the updated docker-compose.yaml
+        project_name: app
+        state: present
+        wait: true
+      register: output
+
+    - name: Show results
+      ansible.builtin.debug:
+        var: output
